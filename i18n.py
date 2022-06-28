@@ -59,7 +59,8 @@ class Tree:
 
             if hasattr(node, "_fields"):
                 for k in node._fields:
-                    if isinstance(sub_node := getattr(node, k), list):
+                    sub_node = getattr(node, k)
+                    if isinstance(sub_node, list):
                         for v in sub_node:
                             yield from _iter_ast(v, node)
                     else:
