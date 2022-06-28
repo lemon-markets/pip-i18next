@@ -1,16 +1,24 @@
 import ast
 import json
 import os
+import sys
 import warnings
 from collections import Counter, OrderedDict
 from functools import cache
 from typing import List, Optional, Union
 
+config = {
+    "locale": ".",
+}
+
 
 @cache
 def get_translation(lang: str) -> dict:
-    # TODO: get translations
-    pass
+    try:
+        with open(os.path.join(config["locale"], f"{lang}.json")) as fh:
+            return json.load(fh)
+    except:
+        return {}
 
 
 def trans(key, params=None, lang="en"):
@@ -28,7 +36,6 @@ def trans(key, params=None, lang="en"):
     try:
         return msg.format(**(params if params else {}))
     except:
-        # logging
         return key
 
 
@@ -174,7 +181,8 @@ def extract_keys() -> List[str]:
                 if filename.endswith(".py"):
                     yield os.path.join(root, filename)
 
-    DIRS_TO_CHECK = [PATH_PLAYBOOK, PATH_APPS]
+    # TODO: change this to a better way to get the root path
+    DIRS_TO_CHECK = ["a", "b"]
     THIS_FILE = os.path.abspath(__file__)
     keys = []
 
@@ -192,8 +200,7 @@ def extract_keys() -> List[str]:
     return keys
 
 
-# Task
-def i18n(ctx):
+def main():
     """
     Scan selected python files and update en.json with new translation keys
     """
@@ -205,7 +212,7 @@ def i18n(ctx):
         return
 
     try:
-        with open(os.path.join(PATH_TO_LOCALE, "en.json")) as fh:
+        with open(os.path.join(config["locale"], "en.json")) as fh:
             en = json.load(fh)
     except:
         en = {}
@@ -214,5 +221,12 @@ def i18n(ctx):
     en.update({k: "" for k in missing_keys})
     en = {k: en[k] for k in sorted(en)}
 
-    with open(os.path.join(PATH_TO_LOCALE, "en.json"), "wt") as fh:
+    with open(os.path.join(config["locale"], "en.json"), "wt") as fh:
         json.dump(en, fh, indent=2, ensure_ascii=False)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except:
+        sys.exit(-1)

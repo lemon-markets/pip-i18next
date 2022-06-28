@@ -98,7 +98,7 @@ def test_get_calls_with_imports_for__from__x__import__y():
         "func": {"ctx": {}, "id": "trans"},
         "keywords": [],
     }
-    assert dump(_import) == "playbook.i18n.trans"
+    assert dump(_import) == "i18n.trans"
 
 
 def test_get_calls_with_imports_for__from__x_import__y_as():
@@ -115,7 +115,7 @@ def test_get_calls_with_imports_for__from__x_import__y_as():
         "func": {"ctx": {}, "id": "_"},
         "keywords": [],
     }
-    assert dump(_import) == "playbook.i18n.trans"
+    assert dump(_import) == "i18n.trans"
 
 
 def test_get_calls_with_imports_for__import__x():
@@ -129,18 +129,10 @@ def test_get_calls_with_imports_for__import__x():
 
     assert dump(call) == {
         "args": [{"kind": None, "value": "3"}],
-        "func": {
-            "attr": "trans",
-            "ctx": {},
-            "value": {
-                "ctx": {},
-                "attr": "i18n",
-                "value": {"ctx": {}, "id": "playbook"},
-            },
-        },
+        "func": {"attr": "trans", "ctx": {}, "value": {"ctx": {}, "id": "i18n"}},
         "keywords": [],
     }
-    assert dump(_import) == "playbook.i18n.trans"
+    assert dump(_import) == "i18n.trans"
 
 
 def test_get_calls_with_imports_for__import__x__as():
@@ -157,12 +149,12 @@ def test_get_calls_with_imports_for__import__x__as():
         "func": {"attr": "trans", "ctx": {}, "value": {"ctx": {}, "id": "_"}},
         "keywords": [],
     }
-    assert dump(_import) == "playbook.i18n.trans"
+    assert dump(_import) == "i18n.trans"
 
 
 def test_get_calls_with_imports_from__class():
     tree = Tree.from_ast(ast.parse(inspect.getsource(func6)))
-    result = list(tree.extract_calls("playbook.i18n.trans"))
+    result = list(tree.extract_calls("i18n.trans"))
 
     assert len(result) == 4
 
