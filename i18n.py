@@ -28,9 +28,7 @@ def trans(key, params=None, lang="en"):
     try:
         return msg.format(**(params if params else {}))
     except:
-        warnings.warn(
-            f"No translation found for {key!r}. Returning key. \nTrace: {get_traceback()}"
-        )
+        # logging
         return key
 
 
@@ -194,6 +192,7 @@ def extract_keys() -> List[str]:
     return keys
 
 
+# Task
 def i18n(ctx):
     """
     Scan selected python files and update en.json with new translation keys
