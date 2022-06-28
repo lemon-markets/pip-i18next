@@ -4,7 +4,6 @@ import os
 import sys
 import warnings
 from collections import Counter, OrderedDict
-from functools import cache
 from typing import List, Optional, Union
 
 config = {
@@ -12,7 +11,6 @@ config = {
 }
 
 
-@cache
 def get_translation(lang: str) -> dict:
     try:
         with open(os.path.join(config["locale"], f"{lang}.json")) as fh:
