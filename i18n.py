@@ -4,7 +4,7 @@ import os
 import warnings
 from collections import Counter, OrderedDict
 from functools import cache
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 
 @cache
@@ -44,8 +44,8 @@ class Tree:
         tree = Tree()
 
         def _iter_ast(
-                node: ast.AST,
-                parent_node: Optional[ast.AST] = None,
+            node: ast.AST,
+            parent_node: Optional[ast.AST] = None,
         ):
             """
             Iterate through the AST and yield each node and its parent.
@@ -118,14 +118,14 @@ class Tree:
                 )
 
                 if isinstance(child.func, ast.Name) and isinstance(
-                        _imp, ast.ImportFrom
+                    _imp, ast.ImportFrom
                 ):
                     if hasattr(child.func, "id") and child.func.id in aliases:
                         yield child, f"{_imp.module}.{aliases[child.func.id]}"
                         break
 
                 if isinstance(child.func, ast.Attribute) and isinstance(
-                        _imp, ast.Import
+                    _imp, ast.Import
                 ):
                     matches = list(
                         filter(lambda x: function_name.startswith(x), aliases)
@@ -158,9 +158,9 @@ def is_call_valid(call: ast.Call):
     Validate if the call has at least one positional argument which is a string
     """
     return (
-            len(call.args) >= 1
-            and isinstance(call.args[0], ast.Constant)
-            and isinstance(call.args[0].value, str)
+        len(call.args) >= 1
+        and isinstance(call.args[0], ast.Constant)
+        and isinstance(call.args[0].value, str)
     )
 
 
@@ -183,7 +183,7 @@ def extract_keys() -> List[str]:
             if path == THIS_FILE:
                 continue
 
-            with open(path, "r") as f:
+            with open(path) as f:
                 tree = Tree.from_ast(ast.parse(f.read()))
 
             for call in tree.extract_calls("playbook.i18n.trans"):
@@ -205,7 +205,7 @@ def i18n(ctx):
         return
 
     try:
-        with open(os.path.join(PATH_TO_LOCALE, "en.json"), "rt") as fh:
+        with open(os.path.join(PATH_TO_LOCALE, "en.json")) as fh:
             en = json.load(fh)
     except:
         en = {}

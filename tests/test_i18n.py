@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from i18n import Tree, get_translation, extract_keys
+from i18n import Tree, extract_keys, get_translation
 
 
 def func1():
