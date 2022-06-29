@@ -58,12 +58,6 @@ def func6():
             _.trans("4")
 
 
-def func7():
-    from i18n import trans
-
-    trans("a " + "b " + "c")
-
-
 def dump(node: ast.AST):
     if hasattr(node, "_fields"):
         d = {}
