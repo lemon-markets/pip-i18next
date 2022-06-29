@@ -1,11 +1,14 @@
 import argparse
 import json
+import logging
 import os
 import sys
 from typing import Iterable, Iterator
 
 from i18n import config
 from i18n.parser import parse
+
+logger = logging.getLogger("i81n.cli")
 
 
 def _iterate_python_paths(search_paths: Iterable[str]) -> Iterator[str]:
@@ -31,14 +34,18 @@ def main():
 
     args = parser.parse_args()
 
-    paths = set(_iterate_python_paths(args.search_paths))
-    fallback_lang = config.fallback_lang
-
-    keys = parse(paths)
+    keys = parse(set(_iterate_python_paths(args.search_paths)))
 
     target_path = os.path.abspath(
-        os.path.join(config.locale_path, f"{fallback_lang}.json")
+        os.path.join(config.locale_path, f"{config.fallback_lang}.json")
     )
+
+    if not os.path.exists(os.path.dirname(target_path)):
+        logger.error(
+            f"Failed to generate translation file. "
+            f"Missing locale directory {os.path.dirname(target_path)!r}"
+        )
+        sys.exit(-1)
 
     try:
         with open(target_path) as fh:
