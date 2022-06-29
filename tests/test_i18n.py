@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from i18n import Tree
+from i18n.parser import Tree
 
 
 def func1():
