@@ -3,9 +3,6 @@ class I18nError(Exception):
         self.message = message
         self.kwargs = kwargs
 
-    def __repr__(self):
-        return f"I18NError(message={self.message}, **{self.kwargs})"
-
     def dict(self):
         return {
             "error_type": self.__class__.__name__,
