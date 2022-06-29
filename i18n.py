@@ -5,40 +5,93 @@ import logging
 import os
 import sys
 from collections import OrderedDict
-from typing import List, Optional, Set, Union
-
-CONFIG = {
-    "locale": ".",
-    "fallback_lang": "en",
-}
+from typing import Any, Dict, List, Optional, Set, Union
 
 logger = logging.getLogger("i18n")
 
+CONFIG = {
+    "locale": "./locale",
+    "fallback_lang": "en",
+}
 
-def get_translation(lang: str) -> dict:
-    try:
-        with open(os.path.join(CONFIG["locale"], f"{lang}.json")) as fh:
-            return json.load(fh)
-    except:
-        return {}
+__i18n_cache__ = {}
 
 
-def trans(key, params=None, lang="en"):
-    """
-    Translation method
-    """
-    try:
-        msg = get_translation(lang)[key]
-    except:
-        # fallback
+# errors
+class I18nError(Exception):
+    def __init__(self, message: str, **kwargs):
+        self.message = message
+        self.kwargs = kwargs
+
+    def __repr__(self):
+        return f"I18NError(message={self.message}, **{self.kwargs})"
+
+    def dict(self):
+        return {
+            "error_type": self.__class__.__name__,
+            "message": self.message,
+            "kwargs": self.kwargs,
+        }
+
+
+class TranslationFileNotFoundError(I18nError):
+    pass
+
+
+class TranslationFileInvalidFormatError(I18nError):
+    pass
+
+
+class TranslationNotFoundError(I18nError):
+    pass
+
+
+class TranslationFormatError(I18nError):
+    pass
+
+
+# translation method
+def trans(
+    key: str, params: Optional[Dict[str, Any]] = None, lang: Optional[str] = None
+):
+    def get_translations(lang: str) -> Dict[str, str]:
         try:
-            msg = get_translation("en")[key]
-        except:
-            return key
+            return __i18n_cache__[lang]
+        except KeyError:
+            path = os.path.join(CONFIG["locale"], f"{lang}.json")
+            try:
+                with open(path) as fg:
+                    __i18n_cache__[lang] = json.load(fg)
+            except FileNotFoundError:
+                raise TranslationFileNotFoundError(
+                    f"Missing {lang!r} translation file {path!r}", path=path, lang=lang
+                )
+            except json.decoder.JSONDecodeError:
+                raise TranslationFileInvalidFormatError(
+                    f"Invalid {lang!r} translation file {path!r}", path=path, lang=lang
+                )
+        return __i18n_cache__[lang]
+
+    lang = lang or CONFIG["fallback_lang"]
+
     try:
-        return msg.format(**(params if params else {}))
-    except:
-        return key
+        translations = get_translations(lang)
+    except TranslationFileNotFoundError:
+        translations = get_translations(CONFIG["fallback_lang"])
+
+    try:
+        translation_string = translations[key]
+    except KeyError:
+        # TODO: are we retrutning smth?
+        raise TranslationNotFoundError(f"Missing key={key}", lang=lang, key=key)
+
+    try:
+        return translation_string.format(**(params if params else {}))
+    except Exception as e:
+        # TODO: are we retrurning smth?
+        raise TranslationFormatError(
+            f"Invalid format for key={key}", lang=lang, key=key
+        ) from e
 
 
 class Tree:
