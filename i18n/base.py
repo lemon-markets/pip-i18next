@@ -13,7 +13,7 @@ from i18n.errors import (
 __cache__ = {}
 
 
-def _translations(lang: str) -> Dict[str, str]:
+def _load_translations(lang: str) -> Dict[str, str]:
     try:
         return __cache__[lang]
     except KeyError:
@@ -38,9 +38,9 @@ def trans(
     lang = lang or CONFIG["fallback_lang"]
 
     try:
-        translations = _translations(lang)
+        translations = _load_translations(lang)
     except TranslationFileNotFoundError:
-        translations = _translations(CONFIG["fallback_lang"])
+        translations = _load_translations(CONFIG["fallback_lang"])
 
     try:
         translation_string = translations[key]
