@@ -47,11 +47,11 @@ def main():
         )
         sys.exit(-1)
 
-    try:
-        with open(target_path) as fh:
+    with open(target_path) as fh:
+        try:
             en = json.load(fh)
-    except:
-        en = {}
+        except:
+            en = {}
 
     missing_keys = set(keys) - set(en)
     en.update({k: "" for k in missing_keys})
