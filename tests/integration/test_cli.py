@@ -1,22 +1,17 @@
 import json
 import os.path
+import subprocess
 from tempfile import TemporaryDirectory
 
 import pytest
 
-from cli import main
 from tests.utils import PROJECT_DIR, TEST_DIR
-
-
-@pytest.fixture
-def cli():
-    return os.path.join(PROJECT_DIR, "cli.py")
 
 
 @pytest.fixture
 def data():
     def create_path(filename):
-        return os.path.join(TEST_DIR, "data", filename)
+        return str(os.path.join(TEST_DIR, "data", filename))
 
     return create_path
 
@@ -26,8 +21,16 @@ def locale():
     return TemporaryDirectory()
 
 
-def test_update_translation_file_from_file(cli, data, locale):
-    main(f"{data('a.py')} --locale {locale.name} -d".split())
+def cli_call(search_paths, locale, lang=None):
+    lang = lang or "en"
+    cli_prog = os.path.join(PROJECT_DIR, "cli.py")
+    return subprocess.run(
+        ["python", cli_prog, search_paths, "--locale", locale, "--lang", lang, "-d"],
+    )
+
+
+def test_update_translation_file_from_file(data, locale):
+    cli_call(data("a.py"), locale.name)
 
     with open(os.path.join(locale.name, "en.json")) as fh:
         en = json.load(fh)
@@ -40,8 +43,8 @@ def test_update_translation_file_from_file(cli, data, locale):
     } == en
 
 
-def test_update_translation_file_from_file_with_lang(cli, data, locale):
-    main(f"{data('a.py')} --locale {locale.name} --lang de -d".split())
+def test_update_translation_file_from_file_with_lang(data, locale):
+    cli_call(data("a.py"), locale.name, "de")
 
     with open(os.path.join(locale.name, "de.json")) as fh:
         en = json.load(fh)
@@ -54,8 +57,8 @@ def test_update_translation_file_from_file_with_lang(cli, data, locale):
     } == en
 
 
-def test_update_translation_file_from_dir(cli, data, locale):
-    main(f"{os.path.join(TEST_DIR, 'data')} --locale {locale.name} --lang en".split())
+def test_update_translation_file_from_dir(data, locale):
+    cli_call(os.path.join(TEST_DIR, "data"), locale.name)
 
     with open(os.path.join(locale.name, "en.json")) as fh:
         en = json.load(fh)
@@ -76,7 +79,7 @@ def test_update_translation_file_from_dir(cli, data, locale):
         en["a-1"] = "some-translation"
         json.dump(en, fh)
 
-    main(f"{os.path.join(TEST_DIR, 'data')} --locale {locale.name} --lang en".split())
+    cli_call(os.path.join(TEST_DIR, "data"), locale.name)
 
     with open(os.path.join(locale.name, "en.json")) as fh:
         en = json.load(fh)
@@ -94,7 +97,4 @@ def test_update_translation_file_from_dir(cli, data, locale):
 
 
 def test_fail_if_locale_are_invalid():
-    with pytest.raises(SystemExit):
-        main(
-            f"{os.path.join(TEST_DIR, 'data')} --locale ./invalid/path --lang en".split()
-        )
+    assert cli_call(os.path.join(TEST_DIR, "data"), "./invalid/locale").returncode != 0
