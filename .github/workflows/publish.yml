@@ -1,23 +1,25 @@
-name: tests
-on: push
+name: publish
+
+on:
+  release:
+    types:
+      - created
 
 jobs:
-  test:
+  publish:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
-    timeout-minutes: 10
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
       - name: Install Flit
         run: pip install flit
       - name: Install Dependencies
         run: flit install --symlink
-      - name: Test
-        run: pytest --cov=i18n --cov=cli tests
+      - name: Publish
+        env:
+          FLIT_USERNAME: ${{ secrets.FLIT_USERNAME }}
+          FLIT_PASSWORD: ${{ secrets.FLIT_PASSWORD }}
+        run: flit publish
