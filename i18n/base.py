@@ -10,17 +10,17 @@ from i18n.errors import (
     TranslationNotFoundError,
 )
 
-__i18n_cache__ = {}
+__cache__ = {}
 
 
 def _translations(lang: str) -> Dict[str, str]:
     try:
-        return __i18n_cache__[lang]
+        return __cache__[lang]
     except KeyError:
         path = os.path.join(CONFIG["locale"], f"{lang}.json")
         try:
             with open(path) as fg:
-                __i18n_cache__[lang] = json.load(fg)
+                __cache__[lang] = json.load(fg)
         except FileNotFoundError:
             raise TranslationFileNotFoundError(
                 f"Missing {lang!r} translation file {path!r}", path=path, lang=lang
@@ -29,7 +29,7 @@ def _translations(lang: str) -> Dict[str, str]:
             raise TranslationFileInvalidFormatError(
                 f"Invalid {lang!r} translation file {path!r}", path=path, lang=lang
             )
-    return __i18n_cache__[lang]
+    return __cache__[lang]
 
 
 def trans(
