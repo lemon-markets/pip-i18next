@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from i18n.parser import _Tree
+from i18n.parser import Tree
 
 
 def func1():
@@ -58,12 +58,6 @@ def func6():
             _.trans("4")
 
 
-def func7():
-    from i18n import trans
-
-    trans("a " + "b " + "c")
-
-
 def dump(node: ast.AST):
     if hasattr(node, "_fields"):
         d = {}
@@ -80,12 +74,12 @@ def dump(node: ast.AST):
 
 def test_root():
     node = ast.parse(inspect.getsource(func1))
-    tree = _Tree.from_ast(node)
+    tree = Tree.from_ast(node)
     assert tree.root == node
 
 
 def test_get_calls_with_imports_for__from__x__import__y():
-    tree = _Tree.from_ast(ast.parse(inspect.getsource(func2)))
+    tree = Tree.from_ast(ast.parse(inspect.getsource(func2)))
 
     result = list(tree.get_calls_with_related_imports())
     assert len(result) == 1
@@ -102,7 +96,7 @@ def test_get_calls_with_imports_for__from__x__import__y():
 
 
 def test_get_calls_with_imports_for__from__x_import__y_as():
-    tree = _Tree.from_ast(ast.parse(inspect.getsource(func3)))
+    tree = Tree.from_ast(ast.parse(inspect.getsource(func3)))
 
     result = list(tree.get_calls_with_related_imports())
     assert len(result) == 1
@@ -119,7 +113,7 @@ def test_get_calls_with_imports_for__from__x_import__y_as():
 
 
 def test_get_calls_with_imports_for__import__x():
-    tree = _Tree.from_ast(ast.parse(inspect.getsource(func4)))
+    tree = Tree.from_ast(ast.parse(inspect.getsource(func4)))
     result = list(tree.get_calls_with_related_imports())
 
     assert len(result) == 1
@@ -136,7 +130,7 @@ def test_get_calls_with_imports_for__import__x():
 
 
 def test_get_calls_with_imports_for__import__x__as():
-    tree = _Tree.from_ast(ast.parse(inspect.getsource(func5)))
+    tree = Tree.from_ast(ast.parse(inspect.getsource(func5)))
     result = list(tree.get_calls_with_related_imports())
 
     assert len(result) == 1
@@ -153,7 +147,7 @@ def test_get_calls_with_imports_for__import__x__as():
 
 
 def test_get_calls_with_imports_from__class():
-    tree = _Tree.from_ast(ast.parse(inspect.getsource(func6)))
+    tree = Tree.from_ast(ast.parse(inspect.getsource(func6)))
     result = list(tree.extract_calls("i18n.trans"))
 
     assert len(result) == 4

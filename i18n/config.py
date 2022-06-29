@@ -1,11 +1,14 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass
 class Config:
     locale_path: str = "./locale"
     fallback_lang: str = "en"
-    fallback_on_missing_translation: bool = True
+    fallback_translation: bool = True
+
+    def dict(self):
+        return asdict(self)
 
 
 config = Config()
