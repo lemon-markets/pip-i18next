@@ -8,7 +8,7 @@ from i18n.config import CONFIG
 from i18n.parser import parse
 
 
-def extract_python_paths(search_paths: Iterable[str]) -> Iterator[str]:
+def _iterate_python_paths(search_paths: Iterable[str]) -> Iterator[str]:
     for path in search_paths:
         path = os.path.abspath(path)
         if os.path.isdir(path):
@@ -17,7 +17,7 @@ def extract_python_paths(search_paths: Iterable[str]) -> Iterator[str]:
                 for f in files:
                     if f.endswith(".py"):
                         paths.append(os.path.join(root, f))
-            yield from extract_python_paths(paths)
+            yield from _iterate_python_paths(paths)
         elif os.path.isfile(path) and path.endswith(".py"):
             yield path
 
@@ -31,7 +31,7 @@ def main():
 
     args = parser.parse_args()
 
-    paths = set(list(extract_python_paths(args.search_paths)))
+    paths = set(_iterate_python_paths(args.search_paths))
     fallback_lang = CONFIG["fallback_lang"]
 
     keys = parse(paths)
