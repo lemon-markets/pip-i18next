@@ -44,7 +44,7 @@ def trans(
         try:
             translations = _load_translations(config.fallback_lang)
         except I18nError:
-            if config.fallback_on_missing_translation:
+            if config.fallback_translation:
                 return key
             raise
 
@@ -52,11 +52,11 @@ def trans(
         trans_string = translations[key]
         return trans_string.format(**(params if params else {}))
     except KeyError as e:
-        if config.fallback_on_missing_translation:
+        if config.fallback_translation:
             return key
         raise TranslationNotFoundError(f"Missing key={key}", lang=lang, key=key) from e
     except Exception as e:
-        if config.fallback_on_missing_translation:
+        if config.fallback_translation:
             return key
         raise TranslationFormatError(
             f"Invalid format for key={key}", lang=lang, key=key

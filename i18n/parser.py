@@ -6,16 +6,16 @@ from typing import Iterable, Optional, Set, Union
 logger = logging.getLogger("i18n.parser")
 
 
-class _Tree:
+class Tree:
     def __init__(self):
         self.nodes = {}
 
     @classmethod
-    def from_ast(self, root_node: ast.AST) -> "_Tree":
+    def from_ast(self, root_node: ast.AST) -> "Tree":
         """
         Create Tree from ast.AST
         """
-        tree = _Tree()
+        tree = Tree()
 
         def _iter_ast(
             node: ast.AST,
@@ -133,7 +133,7 @@ def parse(paths: Iterable[str]) -> Set[str]:
     for path in paths:
         with open(path) as f:
             try:
-                tree = _Tree.from_ast(ast.parse(f.read()))
+                tree = Tree.from_ast(ast.parse(f.read()))
             except:
                 logger.error(f"Failed to read AST from {path!r}")
                 raise
