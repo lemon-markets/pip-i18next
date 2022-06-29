@@ -17,7 +17,7 @@ def _translations(lang: str) -> Dict[str, str]:
     try:
         return __cache__[lang]
     except KeyError:
-        path = os.path.join(CONFIG["locale"], f"{lang}.json")
+        path = os.path.abspath(os.path.join(CONFIG["locale"], f"{lang}.json"))
         try:
             with open(path) as fg:
                 __cache__[lang] = json.load(fg)
