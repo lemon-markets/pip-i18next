@@ -11,13 +11,6 @@ repos:
         -   --unsafe
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
--   repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
-    hooks:
-    -   id: pyupgrade
-        args:
-        - --py3-plus
-        - --keep-runtime-typing
 -   repo: https://github.com/myint/autoflake
     rev: v1.4
     hooks:
@@ -31,11 +24,11 @@ repos:
         - --exclude
         - __init__.py
         - --remove-duplicate-keys
-#-   repo: https://github.com/pycqa/isort
-#    rev: 5.10.1
-#    hooks:
-#    -   id: isort
-#        name: isort (python)
+-   repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+    -   id: isort
+        name: isort (python)
 -   repo: https://github.com/psf/black
     rev: 22.6.0
     hooks:
