@@ -2,13 +2,13 @@ import argparse
 import json
 import os
 import sys
-from typing import List
+from typing import Iterable, Iterator
 
 from i18n.config import CONFIG
-from i18n.parser import extract_keys
+from i18n.parser import parse
 
 
-def extract_python_paths(search_paths: List[str]):
+def extract_python_paths(search_paths: Iterable[str]) -> Iterator[str]:
     for path in search_paths:
         path = os.path.abspath(path)
         if os.path.isdir(path):
@@ -34,7 +34,7 @@ def main():
     paths = set(list(extract_python_paths(args.search_paths)))
     fallback_lang = CONFIG["fallback_lang"]
 
-    keys = extract_keys(paths)
+    keys = parse(paths)
 
     try:
         with open(os.path.join(CONFIG["locale"], f"{fallback_lang}.json")) as fh:

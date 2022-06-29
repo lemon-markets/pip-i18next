@@ -1,21 +1,21 @@
 import ast
 import logging
 from collections import OrderedDict
-from typing import List, Optional, Set, Union
+from typing import Iterable, Optional, Set, Union
 
-logger = logging.getLogger("i18n")
+logger = logging.getLogger("i18n.parser")
 
 
-class Tree:
+class _Tree:
     def __init__(self):
         self.nodes = {}
 
     @classmethod
-    def from_ast(self, root_node: ast.AST) -> "Tree":
+    def from_ast(self, root_node: ast.AST) -> "_Tree":
         """
         Create Tree from ast.AST
         """
-        tree = Tree()
+        tree = _Tree()
 
         def _iter_ast(
             node: ast.AST,
@@ -128,23 +128,12 @@ class Tree:
         return self.nodes
 
 
-def is_call_valid(call: ast.Call):
-    """
-    Validate if the call has at least one positional argument which is a string
-    """
-    return (
-        len(call.args) >= 1
-        and isinstance(call.args[0], ast.Constant)
-        and isinstance(call.args[0].value, str)
-    )
-
-
-def extract_keys(paths: List[str]) -> Set[str]:
+def parse(paths: Iterable[str]) -> Set[str]:
     keys = set()
     for path in paths:
         with open(path) as f:
             try:
-                tree = Tree.from_ast(ast.parse(f.read()))
+                tree = _Tree.from_ast(ast.parse(f.read()))
             except:
                 logger.error(f"Failed to read AST from {path!r}")
                 raise
