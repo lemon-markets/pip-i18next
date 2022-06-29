@@ -10,16 +10,14 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v3
-
-      - name: Setup Python environment
+      - uses: actions/checkout@v3
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: python -m pip install .['test']
-
-      - name: Run tests
+      - name: Install Flit
+        run: pip install flit
+      - name: Install Dependencies
+        run: flit install --symlink
+      - name: Test
         run: pytest --cov=i18n --cov=cli tests
