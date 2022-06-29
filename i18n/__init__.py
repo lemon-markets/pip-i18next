@@ -1,3 +1,3 @@
-from .base import trans
+from .base import trans, config
 
-__all__ = ["trans"]
+__all__ = ["trans", "config"]

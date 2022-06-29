@@ -32,12 +32,12 @@ def main():
     args = parser.parse_args()
 
     paths = set(_iterate_python_paths(args.search_paths))
-    fallback_lang = CONFIG["fallback_lang"]
+    fallback_lang = CONFIG["FALLBACK_LANG"]
 
     keys = parse(paths)
 
     try:
-        with open(os.path.join(CONFIG["locale"], f"{fallback_lang}.json")) as fh:
+        with open(os.path.join(CONFIG["LOCALE_PATH"], f"{fallback_lang}.json")) as fh:
             en = json.load(fh)
     except:
         en = {}
@@ -46,7 +46,7 @@ def main():
     en.update({k: "" for k in missing_keys})
     en = {k: en[k] for k in sorted(en)}
 
-    with open(os.path.join(CONFIG["locale"], f"{fallback_lang}.json"), "wt") as fh:
+    with open(os.path.join(CONFIG["LOCALE_PATH"], f"{fallback_lang}.json"), "wt") as fh:
         json.dump(en, fh, indent=2, ensure_ascii=False)
 
 

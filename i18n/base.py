@@ -2,12 +2,13 @@ import json
 import os
 from typing import Any, Dict, Optional
 
-from i18n.config import CONFIG
+from i18n.config import config
 from i18n.errors import (
     TranslationFileInvalidFormatError,
     TranslationFileNotFoundError,
     TranslationFormatError,
     TranslationNotFoundError,
+    I18nError,
 )
 
 __cache__ = {}
@@ -17,7 +18,7 @@ def _load_translations(lang: str) -> Dict[str, str]:
     try:
         return __cache__[lang]
     except KeyError:
-        path = os.path.abspath(os.path.join(CONFIG["locale"], f"{lang}.json"))
+        path = os.path.abspath(os.path.join(config.locale_path, f"{lang}.json"))
         try:
             with open(path) as fg:
                 __cache__[lang] = json.load(fg)
@@ -35,21 +36,28 @@ def _load_translations(lang: str) -> Dict[str, str]:
 def trans(
     key: str, params: Optional[Dict[str, Any]] = None, lang: Optional[str] = None
 ):
-    lang = lang or CONFIG["fallback_lang"]
+    lang = lang or config.fallback_lang
 
     try:
         translations = _load_translations(lang)
-    except TranslationFileNotFoundError:
-        translations = _load_translations(CONFIG["fallback_lang"])
+    except I18nError:
+        try:
+            translations = _load_translations(config.fallback_lang)
+        except I18nError:
+            if config.fallback_on_missing_translation:
+                return key
+            raise
 
     try:
-        translation_string = translations[key]
-    except KeyError:
-        raise TranslationNotFoundError(f"Missing key={key}", lang=lang, key=key)
-
-    try:
-        return translation_string.format(**(params if params else {}))
-    except:
+        trans_string = translations[key]
+        return trans_string.format(**(params if params else {}))
+    except KeyError as e:
+        if config.fallback_on_missing_translation:
+            return key
+        raise TranslationNotFoundError(f"Missing key={key}", lang=lang, key=key) from e
+    except Exception as e:
+        if config.fallback_on_missing_translation:
+            return key
         raise TranslationFormatError(
             f"Invalid format for key={key}", lang=lang, key=key
-        )
+        ) from e
