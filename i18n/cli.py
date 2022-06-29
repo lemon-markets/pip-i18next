@@ -80,10 +80,3 @@ def main(args=None):
         logger.debug(f" {path}")
 
     update_translation_keys(paths)
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except:
-        sys.exit(-1)
