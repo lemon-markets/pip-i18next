@@ -1,11 +1,11 @@
 import json
 import os.path
-import subprocess
 from tempfile import TemporaryDirectory
 
 import pytest
 
-from tests.utils import PROJECT_DIR, TEST_DIR
+from cli import main
+from tests.utils import TEST_DIR
 
 
 @pytest.fixture
@@ -23,10 +23,7 @@ def locale():
 
 def cli_call(search_paths, locale, lang=None):
     lang = lang or "en"
-    cli_prog = os.path.join(PROJECT_DIR, "cli.py")
-    return subprocess.run(
-        ["python", cli_prog, search_paths, "--locale", locale, "--lang", lang, "-d"],
-    )
+    return main([search_paths, "--locale", locale, "--lang", lang, "-d"])
 
 
 def test_update_translation_file_from_file(data, locale):
@@ -97,4 +94,5 @@ def test_update_translation_file_from_dir(data, locale):
 
 
 def test_fail_if_locale_are_invalid():
-    assert cli_call(os.path.join(TEST_DIR, "data"), "./invalid/locale").returncode != 0
+    with pytest.raises(SystemExit):
+        cli_call(os.path.join(TEST_DIR, "data"), "./invalid/locale")
