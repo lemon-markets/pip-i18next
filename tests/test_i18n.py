@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from i18n import Tree, extract_keys, get_translation
+from i18n import Tree
 
 
 def func1():
@@ -160,23 +160,3 @@ def test_get_calls_with_imports_from__class():
 
     for r, exp in zip(result, ["1", "2", "3", "4"]):
         assert r.args[0].value == exp
-
-
-def test_all_keys_translated():
-    """
-    test all keys in source code are translated
-    :return:
-    """
-
-    translation = get_translation("en")
-    translated_keys = set(translation.keys())
-
-    keys = set(extract_keys())
-
-    missing_keys = keys - translated_keys
-    assert not missing_keys, f"Missing translations for keys: {missing_keys}"
-
-
-def test_no_duplicate_translation_keys():
-    keys = extract_keys()
-    assert len(keys) == len(set(keys)), "Duplicate keys found"

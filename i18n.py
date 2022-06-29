@@ -1,19 +1,23 @@
+import argparse
 import ast
 import json
+import logging
 import os
 import sys
-import warnings
-from collections import Counter, OrderedDict
-from typing import List, Optional, Union
+from collections import OrderedDict
+from typing import List, Optional, Set, Union
 
-config = {
+CONFIG = {
     "locale": ".",
+    "fallback_lang": "en",
 }
+
+logger = logging.getLogger("i18n")
 
 
 def get_translation(lang: str) -> dict:
     try:
-        with open(os.path.join(config["locale"], f"{lang}.json")) as fh:
+        with open(os.path.join(CONFIG["locale"], f"{lang}.json")) as fh:
             return json.load(fh)
     except:
         return {}
@@ -170,48 +174,57 @@ def is_call_valid(call: ast.Call):
     )
 
 
-def extract_keys() -> List[str]:
-    def get_python_paths(root_path):
-        """
-        Get all python files under the root path
-        """
-        for root, directories, files in os.walk(root_path):
-            for filename in files:
-                if filename.endswith(".py"):
-                    yield os.path.join(root, filename)
-
-    # TODO: change this to a better way to get the root path
-    DIRS_TO_CHECK = ["a", "b"]
-    THIS_FILE = os.path.abspath(__file__)
-    keys = []
-
-    for dir in DIRS_TO_CHECK:
-        for path in get_python_paths(dir):
-            if path == THIS_FILE:
-                continue
-
-            with open(path) as f:
+def extract_keys(paths: List[str]) -> Set[str]:
+    keys = set()
+    for path in paths:
+        with open(path) as f:
+            try:
                 tree = Tree.from_ast(ast.parse(f.read()))
+            except:
+                logger.error(f"Failed to read AST from {path!r}")
+                raise
 
-            for call in tree.extract_calls("playbook.i18n.trans"):
-                if is_call_valid(call):
-                    keys.append(call.args[0].value)
+        for call in tree.extract_calls("i18n.trans"):
+            # Validate if the call has at least one positional argument which is a string
+            if (
+                len(call.args) >= 1
+                and isinstance(call.args[0], ast.Constant)
+                and isinstance(call.args[0].value, str)
+            ):
+                keys.add(call.args[0].value)
     return keys
+
+
+def extract_python_paths(search_paths: List[str]):
+    for path in search_paths:
+        path = os.path.abspath(path)
+        if os.path.isdir(path):
+            paths = []
+            for root, _, files in os.walk(path):
+                for f in files:
+                    if f.endswith(".py"):
+                        paths.append(os.path.join(root, f))
+            yield from extract_python_paths(paths)
+        elif os.path.isfile(path) and path.endswith(".py"):
+            yield path
 
 
 def main():
     """
     Scan selected python files and update en.json with new translation keys
     """
-    keys = extract_keys()
-    if len(keys) != len(set(keys)):
-        for k, v in Counter(keys).items():
-            if v > 1:
-                warnings.warn(f"Found duplicated key {k} (amount={v})")
-        return
+    parser = argparse.ArgumentParser()
+    parser.add_argument("search_paths", nargs="*", default=["."])
+
+    args = parser.parse_args()
+
+    paths = set(list(extract_python_paths(args.search_paths)))
+    fallback_lang = CONFIG["fallback_lang"]
+
+    keys = extract_keys(paths)
 
     try:
-        with open(os.path.join(config["locale"], "en.json")) as fh:
+        with open(os.path.join(CONFIG["locale"], f"{fallback_lang}.json")) as fh:
             en = json.load(fh)
     except:
         en = {}
@@ -220,7 +233,7 @@ def main():
     en.update({k: "" for k in missing_keys})
     en = {k: en[k] for k in sorted(en)}
 
-    with open(os.path.join(config["locale"], "en.json"), "wt") as fh:
+    with open(os.path.join(CONFIG["locale"], f"{fallback_lang}.json"), "wt") as fh:
         json.dump(en, fh, indent=2, ensure_ascii=False)
 
 
