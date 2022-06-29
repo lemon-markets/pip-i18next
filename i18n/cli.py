@@ -4,7 +4,7 @@ import os
 import sys
 from typing import Iterable, Iterator
 
-from i18n.config import CONFIG
+from i18n import config
 from i18n.parser import parse
 
 
@@ -32,12 +32,16 @@ def main():
     args = parser.parse_args()
 
     paths = set(_iterate_python_paths(args.search_paths))
-    fallback_lang = CONFIG["FALLBACK_LANG"]
+    fallback_lang = config.fallback_lang
 
     keys = parse(paths)
 
+    target_path = os.path.abspath(
+        os.path.join(config.locale_path, f"{fallback_lang}.json")
+    )
+
     try:
-        with open(os.path.join(CONFIG["LOCALE_PATH"], f"{fallback_lang}.json")) as fh:
+        with open(target_path) as fh:
             en = json.load(fh)
     except:
         en = {}
@@ -46,7 +50,7 @@ def main():
     en.update({k: "" for k in missing_keys})
     en = {k: en[k] for k in sorted(en)}
 
-    with open(os.path.join(CONFIG["LOCALE_PATH"], f"{fallback_lang}.json"), "wt") as fh:
+    with open(target_path, "wt") as fh:
         json.dump(en, fh, indent=2, ensure_ascii=False)
 
 
