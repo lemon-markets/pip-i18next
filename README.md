@@ -8,7 +8,7 @@
 
 **i18next** is a library facilitating internationalization and localization (i18n) of your Python applications
 
-## Why we do this?
+## Rationale
 
 The idea of the project came from the experiences we encountered during the internationalization of projects created
 as part of [lemon.markets](http://lemon.markets).  We were not entirely satisfied with the i18n tools available on the market.
