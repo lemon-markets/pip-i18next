@@ -24,6 +24,8 @@ pip install lemon-i18n
 
 # Usage
 
+The table below describes the terms used widely in this documentation.
+
 ## Glossary
 | Term                | Description                                                        |
 |---------------------|--------------------------------------------------------------------|
@@ -33,10 +35,11 @@ pip install lemon-i18n
 | translation         | translation string filled with translation data                    |
 | translation file    | file containing mapping of translation keys and translation string |
 
+## General
 As part of `lemon-i18n`, we offer two main functionalities:
 
 - API to access translation for a given key and language
-- a cli tool used to scann the Python source code for translation keys and storing them in a translation file
+- a cli tool used to scan the Python source code for translation keys and storing them in a translation file
 
 ## Configuring the `lemon-i18n` module
 
@@ -54,14 +57,44 @@ The table below describes the configuration parameters:
 
 | Parameter            | Description                                                                                                                                                                                                                                            | Default value |
 |----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| fallback_lang        | fallback language to search fro translation key if one cannot be found within requested language                                                                                                                                                       | en            |
+| fallback_lang        | fallback language to search for translation key if one cannot be found within requested language                                                                                                                                                       | en            |
 | locale_path          | directory path to locale files                                                                                                                                                                                                                         | ./locale      |
 | fallback_translation | flag determining the behavior of `trans` function in case given translation key is not found within requested language and fallback language. If set to True - translation key will be returned, otherwise - `TranslationNotFoundError` will be raised | True          |
 
 ## Using `trans` function
 
+`trans` function is executing two steps:
+- firstly, it searches for translation string based on translation key and requested language
+- secondly, it populates translation context within translation string to finally return ready translation.
+
+The interface of this function is presented below:
 
 ```python
+def trans(
+    key: str,
+    params: Optional[Dict[str, Any]] = None,
+    lang: Optional[str] = None
+):
+    ...
+```
+Description of the parameters:
+- `key` - translation key
+- `params` - translation context [optional]
+- `lang` - language to search for translation string [optional]
+
+User has to provide at least `key` to get a translation.
+`params` are used to populate translation string with translation context to produce ready translation.
+`lang` is used to determine language to search for translation string, if not provided the `config.fallback_lang` will be used.
+
+Typical usage of the function is presented below:
+
+```python
+from i18n import trans
+# The content of the './locale/en.json' is as follows:
+# {
+#    "some-key": "Welcome {firstname} {lastname}"
+# }
+translated_string = trans('some-key', params={'firstname': 'John', 'lastname': 'Doe'})
 ```
 
 ## Extracting translations from source code
