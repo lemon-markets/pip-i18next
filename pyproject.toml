@@ -47,13 +47,13 @@ dev = [
 ]
 
 [project.scripts]
-i18n = 'i18n.cli:main'
+i18n = 'i18next.cli:main'
 
 [project.urls]
 Home = "https://github.com/lemon-markets/pip-i18n-turbo"
 
 [tool.flit.module]
-name = "i18n"
+name = "i18next"
 
 [tool.flit.sdist]
 exclude = ["tests/*"]

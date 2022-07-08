@@ -4,7 +4,6 @@ from typing import Any, Dict, Optional
 
 from i18next.config import config
 from i18next.errors import (
-    TranslationFileInvalidFormatError,
     TranslationFileNotFoundError,
     TranslationFormatError,
     TranslationNotFoundError,
@@ -25,10 +24,6 @@ def _load_translations(lang: str) -> Dict[str, str]:
         except FileNotFoundError:
             raise TranslationFileNotFoundError(
                 f"Missing {lang!r} translation file {path!r}", path=path, lang=lang
-            )
-        except json.decoder.JSONDecodeError:
-            raise TranslationFileInvalidFormatError(
-                f"Invalid {lang!r} translation file {path!r}", path=path, lang=lang
             )
     return __cache__[lang]
 

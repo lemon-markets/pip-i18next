@@ -1,4 +1,5 @@
 # i18next
+
 [![License](https://img.shields.io/github/license/lemon-markets/pip-i18n-turbo
 )](./LICENSE)
 [![Tests](https://img.shields.io/github/workflow/status/lemon-markets/pip-i18n-turbo/tests/main?label=tests)](https://github.com/lemon-markets/sdk-python/actions)
@@ -28,10 +29,13 @@ The table below describes the terms used in this documentation.
 | translation         | interpolated translation string                                     |
 
 ## Locale files
-`i18next` assumes the existence of the locale directory containing translation files. The directory path can be configured (see section [Configuration](#configuration)).
+
+`i18next` assumes the existence of the locale directory containing translation files. The locale directory path can be
+configured (see section [Configuration](#configuration)).
 
 Translation files are JSON files containing mapping between translation keys and translation strings.
 The translation file should be named as `<language>.json` where` <language> `is a language code.
+
 An example of translation file content is presented below:
 
 ```json
@@ -42,6 +46,7 @@ An example of translation file content is presented below:
 ```
 
 An example directory structure of your locale directory should be similar to:
+
 ```
 locale/
   en.json
@@ -50,9 +55,11 @@ locale/
   pt.json
   ...
 ```
+
 ## Configuration
+
 `i18next` configuration is being done by modifying global `config` object from `i18next` package.
-It should be done <u>before first usage of `trans` function</u>:
+It should be done before first usage of `trans` function:
 
 ```python
 from i18next import config
@@ -61,61 +68,102 @@ config.fallback_lang = 'en'
 config.locale_path = '/path/to/your/locale/directory'
 config.strict = False
 ```
+
 The table below describes the configuration parameters:
 
-| Parameter     | Description                                                                                                                                                                                                      | Default value |
-|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| fallback_lang | Fallback language to search for translation key if one cannot be found for requested language                                                                                                                    | en            |
-| locale_path   | Directory path to locale files                                                                                                                                                                                   | ./locale      |
-| strict        | Flag determining the behavior of `trans` function. If set to False - `key` itself will be returned in case one has not been found or translation interpolation has failed , otherwise - exception will be raised | False         |
+| Parameter     | Description                                                                                                                                                                                          | Default value |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| fallback_lang | Fallback language to search for translation key if one cannot be found for requested language                                                                                                        | en            |
+| locale_path   | Locale directory path                                                                                                                                                                                | ./locale      |
+| strict        | Flag determining the behavior of `trans` function. If set to False - `key` itself will be returned in case one has not been found or interpolation has failed , otherwise - exception will be raised | False         |
 
 ## Usage
-### Using `trans` function
 
-`trans` function is executing two steps:
-- it searches for translation string based on translation key and requested language
-- it populates translation context within translation string to finally return ready translation.
+`trans` function is used to get translation based on translation key and requested language.
 
-The interface of this function is presented below:
+### Non-strict mode
 
 ```python
-def trans(
-    key: str,
-    params: Optional[Dict[str, Any]] = None,
-    lang: Optional[str] = None
-):
+from i18next import trans, config
+
+# './locale/en.json':
+# {
+#    "key-1": "Welcome {firstname} {lastname}!",
+#    "key-2": "Good morning!",
+#    "key-3": "Bye!"
+# }
+# './locale/pl.json':
+# {
+#    "key-1": "Witaj {firstname} {lastname}!",
+#    "key-2": "Dzień dobry!"
+# }
+
+config.fallback_lang = 'en'
+config.strict = False
+
+en_trans1 = trans('key-1', params={'firstname': 'John', 'lastname': 'Doe'}) # 'Welcome John Doe!'
+en_trans2 = trans('key-2') # 'Good morning!'
+en_trans3 = trans('key-3') # 'Bye!'
+
+pl_trans1 = trans('key-1', params={'firstname': 'John', 'lastname': 'Doe'}, lang='pl') # 'Witaj John Doe!'
+pl_trans2 = trans('key-2', lang='pl') # 'Dzień dobry!'
+pl_trans3 = trans('key-3', lang='pl') # 'Bye!' - fallback case because of missing 'key-3' in pl translation
+
+# config.strict=False so key itself is returned when translation key or file is missing
+missing_en_trans = trans('missing-key1') # 'missing-key1'
+missing_pl_trans = trans('missing-key2', lang='pl') # 'missing-key2'
+missing_fr_trans = trans('missing-key3', lang='fr') # 'missing-key3' because translation file is missing
+```
+
+### Strict mode
+
+`trans` function is raising exceptions in strict mode (`config.strict=True`) when:
+
+- translation file is missing
+- translation key does not exist
+- interpolation fails
+
+```python
+from i18next import trans, config, errors
+
+# './locale/en.json':
+# {
+#    "key-1": "Welcome {firstname} {lastname}!",
+#    "key-2": "Good morning!"
+# }
+
+config.strict = True
+
+en_trans1 = trans('key-1', params={'firstname': 'John', 'lastname': 'Doe'}) # 'Welcome John Doe!'
+en_trans2 = trans('key-2')                                                  # 'Good morning!'
+
+
+# interpolation error
+try:
+    trans('key-1', params={'firstname': 'John'}) # missing lastname
+except errors.TranslationFormatError:
+    ...
+
+# missing translation key
+try:
+    trans('missing-key')
+except errors.TranslationNotFoundError:
+    ...
+
+# missing translation file
+try:
+    trans('key-2', lang='pl')
+except errors.TranslationFileNotFoundError:
     ...
 ```
-Description of the parameters:
-- `key` - translation key
-- `params` - translation context [optional]
-- `lang` - language to search for translation string [optional]
-
-User has to provide at least `key` to get a translation.
-`params` are used to populate translation string with translation context to produce ready translation.
-`lang` is used to determine language to search for translation string, if not provided the `config.fallback_lang` will be used.
-
-Typical usage of the function is presented below:
-
-```python
-from i18next import trans
-
-# The content of the './locale/en.json' is as follows:
-# {
-#    "some-key": "Welcome, {firstname} {lastname}"
-# }
-# The content of the './locale/pl.json' is as follows:
-# {
-#    "some-key": "Witaj, {firstname} {lastname}"
-# }
-en_translation = trans('some-key', params={'firstname': 'John', 'lastname': 'Doe'})  # 'Welcome, John Doe'
-pl_translation = trans('some-key', params={'firstname': 'John', 'lastname': 'Doe'}, lang='pl')  # 'Witaj, John Doe'
-```
-
-`trans` function is searching for translation files in `config.locale_path`. It means that if the user requested translation
-for `lang='en'` it will search for `$config.locale_path/en.json` file .
-
-### Extracting translations from source code
-
 
 ### Error handling
+
+Exception hierarchy available in strict mode is presented below:
+
+- `I18nError` - base class for all exceptions thrown within `i18next` library
+  - `TranslationFileNotFoundError` - missing translation file error
+  - `TranslationNotFoundError` - missing translation key error
+  - `TranslationFormatError` - interpolation error
+
+## Extracting translation keys from source code

@@ -5,12 +5,10 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from i18next.base import clear_cache
 from i18next.errors import (
     TranslationFileNotFoundError,
     TranslationNotFoundError,
     TranslationFormatError,
-    TranslationFileInvalidFormatError,
 )
 
 
@@ -52,15 +50,6 @@ class TestNoFallbackOnMissingTranslationTests:
     def test_fail_on_bad_formatting(self):
         with pytest.raises(TranslationFormatError):
             trans("key", params={"other-arg": 1})
-
-    def test_fail_on_invalid_translation_format(self, locale):
-        clear_cache()
-
-        with open(os.path.join(locale.name, "en.json"), "wt") as fh:
-            fh.write("bum")
-
-        with pytest.raises(TranslationFileInvalidFormatError):
-            trans("key")
 
     def test_get_translation(self):
         result = trans("key", params={"arg": "translated arg"})

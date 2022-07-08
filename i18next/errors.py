@@ -15,10 +15,6 @@ class TranslationFileNotFoundError(I18nError):
     pass
 
 
-class TranslationFileInvalidFormatError(I18nError):
-    pass
-
-
 class TranslationNotFoundError(I18nError):
     pass
 
