@@ -3,7 +3,7 @@ import logging
 from collections import OrderedDict
 from typing import Iterable, Optional, Set, Union
 
-logger = logging.getLogger("i18n.parser")
+logger = logging.getLogger("i18next.parser")
 
 
 class Tree:
@@ -138,7 +138,7 @@ def parse(paths: Iterable[str]) -> Set[str]:
                 logger.error(f"Failed to read AST from {path!r}")
                 raise
 
-        for call in tree.extract_calls("i18n.trans"):
+        for call in tree.extract_calls("i18next.trans"):
             # Validate if the call has at least one positional argument which is a string
             if (
                 len(call.args) >= 1

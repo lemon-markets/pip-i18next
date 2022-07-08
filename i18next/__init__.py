@@ -1,4 +1,4 @@
-"""i18n library"""
+"""i18next library"""
 __version__ = "0.0.1"
 
 from .base import trans, config

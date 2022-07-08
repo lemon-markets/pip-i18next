@@ -1,12 +1,12 @@
 import json
 import os.path
-from i18n import config, trans
+from i18next import config, trans
 from tempfile import TemporaryDirectory
 
 import pytest
 
-from i18n.base import clear_cache
-from i18n.errors import (
+from i18next.base import clear_cache
+from i18next.errors import (
     TranslationFileNotFoundError,
     TranslationNotFoundError,
     TranslationFormatError,
@@ -33,7 +33,7 @@ class TestNoFallbackOnMissingTranslationTests:
     def setup(self, locale):
         config.locale_path = locale.name
         config.fallback_lang = "en"
-        config.fallback_translation = False
+        config.strict = True
 
     def test_fail_on_missing_translation_file(self):
         config.fallback_lang = "de"
@@ -72,7 +72,7 @@ class TestFallbackOnMissingTranslationTests:
     def setup(self, locale):
         config.locale_path = locale.name
         config.fallback_lang = "en"
-        config.fallback_translation = True
+        config.strict = False
 
     def test_fail_on_missing_translation_file(self):
         config.fallback_lang = "de"

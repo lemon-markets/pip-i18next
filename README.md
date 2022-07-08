@@ -1,71 +1,80 @@
-# lemon-i18n
+# i18next
 [![License](https://img.shields.io/github/license/lemon-markets/pip-i18n-turbo
 )](./LICENSE)
 [![Tests](https://img.shields.io/github/workflow/status/lemon-markets/pip-i18n-turbo/tests/main?label=tests)](https://github.com/lemon-markets/sdk-python/actions)
-[![Python versions](https://img.shields.io/pypi/pyversions/pip-i18n-turbo.svg)](https://pypi.python.org/pypi/lemon-i18n/)
-[![PyPI](https://img.shields.io/pypi/v/lemon-i18n)](https://pypi.python.org/pypi/lemon-i18n/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pip-i18n-turbo.svg)](https://pypi.python.org/pypi/i18next/)
+[![PyPI](https://img.shields.io/pypi/v/i18next)](https://pypi.python.org/pypi/i18-next/)
 
-**lemon-i18n** is a library for internationalization and localization (i18n) of your Python applications
-
-# Why to use this library?
-
-TBD
+**i18next** is a library facilitating internationalization and localization (i18n) of your Python applications
 
 ## Installation
 
 You can install library using [pip](http://pypi.python.org/pypi/pip):
 
 ```bash
-pip install lemon-i18n
+pip install i18next
 ```
 
-## Requirements
-- Python 3.8, 3.9, 3.10
-
-# Usage
-
-The table below describes the terms used widely in this documentation.
-
 ## Glossary
-| Term                | Description                                                        |
-|---------------------|--------------------------------------------------------------------|
-| translation key     | unique key identifying translation string                          |
-| translation string  | string to be translated                                            |
-| translation context | data should be used to fill in the translation string              |
-| translation         | translation string filled with translation data                    |
-| translation file    | file containing mapping of translation keys and translation string |
 
-## General
-As part of `lemon-i18n`, we offer two main functionalities:
+The table below describes the terms used in this documentation.
 
-- API to access translation for a given key and language
-- a cli tool used to scan the Python source code for translation keys and storing them in a translation file
+| Term                | Description                                                         |
+|---------------------|---------------------------------------------------------------------|
+| translation key     | unique key identifying translation string                           |
+| translation string  | string to be translated                                             |
+| translation context | data used to interpolate translation string                         |
+| translation file    | file containing mapping of translation keys and translation strings |
+| translation         | interpolated translation string                                     |
 
-## Configuring the `lemon-i18n` module
+## Locale files
+`i18next` assumes the existence of the locale directory containing translation files. The directory path can be configured (see section [Configuration](#configuration)).
 
-`lemon-i18n` has to be configured to achieve expected functionality.
-Configuration is done by modifying global `config` object before first usage of `trans` function.
+Translation files are JSON files containing mapping between translation keys and translation strings.
+The translation file should be named as `<language>.json` where` <language> `is a language code.
+An example of translation file content is presented below:
+
+```json
+{
+  "translation-key-1": "This is a text without interpolation",
+  "translation-key-2": "This is a text with interpolation: { interpolated-value }"
+}
+```
+
+An example directory structure of your locale directory should be similar to:
+```
+locale/
+  en.json
+  fr.json
+  es.json
+  pt.json
+  ...
+```
+## Configuration
+`i18next` configuration is being done by modifying global `config` object from `i18next` package.
+It should be done <u>before first usage of `trans` function</u>:
 
 ```python
-from i18n import config
+from i18next import config
 
 config.fallback_lang = 'en'
 config.locale_path = '/path/to/your/locale/directory'
-config.fallback_translation = False
+config.strict = False
 ```
 The table below describes the configuration parameters:
 
-| Parameter            | Description                                                                                                                                                                                                                                            | Default value |
-|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| fallback_lang        | fallback language to search for translation key if one cannot be found within requested language                                                                                                                                                       | en            |
-| locale_path          | directory path to locale files                                                                                                                                                                                                                         | ./locale      |
-| fallback_translation | flag determining the behavior of `trans` function in case given translation key is not found within requested language and fallback language. If set to True - translation key will be returned, otherwise - `TranslationNotFoundError` will be raised | True          |
+| Parameter     | Description                                                                                                                                                                                                      | Default value |
+|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| fallback_lang | Fallback language to search for translation key if one cannot be found for requested language                                                                                                                    | en            |
+| locale_path   | Directory path to locale files                                                                                                                                                                                   | ./locale      |
+| strict        | Flag determining the behavior of `trans` function. If set to False - `key` itself will be returned in case one has not been found or translation interpolation has failed , otherwise - exception will be raised | False         |
 
-## Using `trans` function
+## Usage
+### Using `trans` function
 
 `trans` function is executing two steps:
-- firstly, it searches for translation string based on translation key and requested language
-- secondly, it populates translation context within translation string to finally return ready translation.
+- it searches for translation string based on translation key and requested language
+- it populates translation context within translation string to finally return ready translation.
 
 The interface of this function is presented below:
 
@@ -89,15 +98,24 @@ User has to provide at least `key` to get a translation.
 Typical usage of the function is presented below:
 
 ```python
-from i18n import trans
+from i18next import trans
+
 # The content of the './locale/en.json' is as follows:
 # {
-#    "some-key": "Welcome {firstname} {lastname}"
+#    "some-key": "Welcome, {firstname} {lastname}"
 # }
-translated_string = trans('some-key', params={'firstname': 'John', 'lastname': 'Doe'})
+# The content of the './locale/pl.json' is as follows:
+# {
+#    "some-key": "Witaj, {firstname} {lastname}"
+# }
+en_translation = trans('some-key', params={'firstname': 'John', 'lastname': 'Doe'})  # 'Welcome, John Doe'
+pl_translation = trans('some-key', params={'firstname': 'John', 'lastname': 'Doe'}, lang='pl')  # 'Witaj, John Doe'
 ```
 
-## Extracting translations from source code
+`trans` function is searching for translation files in `config.locale_path`. It means that if the user requested translation
+for `lang='en'` it will search for `$config.locale_path/en.json` file .
+
+### Extracting translations from source code
 
 
-## Error handling
+### Error handling

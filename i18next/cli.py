@@ -5,8 +5,8 @@ import os
 import sys
 from typing import Iterable, Iterator
 
-from i18n import config
-from i18n.parser import parse
+from i18next import config
+from i18next.parser import parse
 
 logger = logging.getLogger("i81n.cli")
 
