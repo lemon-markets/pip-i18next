@@ -159,11 +159,85 @@ except errors.TranslationFileNotFoundError:
 
 ### Error handling
 
-Exception hierarchy available in strict mode is presented below:
+Error hierarchy available in strict mode is presented below:
 
 - `I18nError` - base class for all exceptions thrown within `i18next` library
   - `TranslationFileNotFoundError` - missing translation file error
   - `TranslationNotFoundError` - missing translation key error
   - `TranslationFormatError` - interpolation error
 
-## Extracting translation keys from source code
+## CLI to extract translation keys from source code
+
+`i18next` library provides a command line interface to extract translation keys from Python source code.
+
+```bash
+bash$ i18next --help
+
+usage: i18next [-h] [--locale [LOCALE]] [--lang [LANG]] [--debug] [search_paths ...]
+
+positional arguments:
+  search_paths       Paths to search for python files
+
+options:
+  -h, --help         show this help message and exit
+  --locale [LOCALE]  Locale directory path
+  --lang [LANG]      Language code
+  --debug, -d        Enable debug logging
+```
+
+Basic usage is presented below:
+
+```bash
+i18next --locale ./locale --lang en --search_paths ./your_package/ ./your/module.py
+```
+
+### How it works?
+
+`i18next` CLI:
+- scans search paths for python files
+- extracts translation keys from each file by analysing `trans` function calls
+- updates translation file with new translation keys containing empty translations
+
+Translation file to be updated is selected based on language provided in cli call (`--lang`).
+Please note that currently `i18next` is not removing any translation keys from translation file.
+
+### Which statements are being detected by the CLI?
+
+As mentioned above, `i18next` CLI is detecting translation keys by analysing `trans` function calls.
+Currently, we support following statements:
+
+```python
+#1
+from i18next import trans
+trans("1")
+
+#2
+from i18next import trans as _
+_("2")
+
+#3
+import i18next
+i18next.trans("3")
+
+#4
+import i18next as _
+_.trans("4")
+
+#5
+class A:
+    def a(self):
+        from i18next import trans
+        trans("1")
+
+    def b(self):
+        from i18next import trans as _
+        _("2")
+
+    def c(self):
+        import i18next
+        i18next.trans("3")
+
+    def d(self):
+        import i18next as _
+        _.trans("4")
+```

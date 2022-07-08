@@ -47,7 +47,7 @@ dev = [
 ]
 
 [project.scripts]
-i18n = 'i18next.cli:main'
+i18next = 'i18next.cli:main'
 
 [project.urls]
 Home = "https://github.com/lemon-markets/pip-i18n-turbo"
