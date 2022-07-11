@@ -28,7 +28,7 @@ classifiers = [
     "Topic :: Software Development :: Localization",
 ]
 dynamic = ["version", "description"]
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.11"
 
 [project.optional-dependencies]
 test = [
@@ -46,7 +46,7 @@ dev = [
 i18next = 'i18next.cli:main'
 
 [project.urls]
-Home = "https://github.com/lemon-markets/pip-i18n-turbo"
+Home = "https://github.com/lemon-markets/pip-i18next"
 
 [tool.flit.module]
 name = "i18next"
