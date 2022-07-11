@@ -20,6 +20,6 @@ jobs:
         run: flit install --symlink
       - name: Publish
         env:
-          FLIT_USERNAME: ${{ secrets.FLIT_USERNAME }}
+          FLIT_USERNAME: __token__
           FLIT_PASSWORD: ${{ secrets.FLIT_PASSWORD }}
         run: flit publish
