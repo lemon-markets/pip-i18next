@@ -1,4 +1,4 @@
-from i18n import trans
+from i18next import trans
 
 
 class B:

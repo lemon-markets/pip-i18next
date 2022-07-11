@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from i18n.cli import main
+from i18next.cli import main
 from tests.utils import TEST_DIR
 
 

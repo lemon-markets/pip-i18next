@@ -5,7 +5,7 @@ from dataclasses import dataclass, asdict
 class Config:
     locale_path: str = "./locale"
     fallback_lang: str = "en"
-    fallback_translation: bool = True
+    strict: bool = False
 
     def dict(self):
         return asdict(self)

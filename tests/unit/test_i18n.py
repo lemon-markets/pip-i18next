@@ -1,7 +1,7 @@
 import ast
 import inspect
 
-from i18n.parser import Tree
+from i18next.parser import Tree
 
 
 def func1():
@@ -9,25 +9,25 @@ def func1():
 
 
 def func2():
-    from i18n import trans
+    from i18next import trans
 
     trans("1")
 
 
 def func3():
-    from i18n import trans as _
+    from i18next import trans as _
 
     _("2")
 
 
 def func4():
-    import i18n
+    import i18next
 
-    i18n.trans("3")
+    i18next.trans("3")
 
 
 def func5():
-    import i18n as _
+    import i18next as _
 
     _.trans("4")
 
@@ -38,22 +38,22 @@ def func6():
             pass
 
         def a(self):
-            from i18n import trans
+            from i18next import trans
 
             trans("1")
 
         def b(self):
-            from i18n import trans as _
+            from i18next import trans as _
 
             _("2")
 
         def c(self):
-            import i18n
+            import i18next
 
-            i18n.trans("3")
+            i18next.trans("3")
 
         def d(self):
-            import i18n as _
+            import i18next as _
 
             _.trans("4")
 
@@ -92,7 +92,7 @@ def test_get_calls_with_imports_for__from__x__import__y():
         "func": {"ctx": {}, "id": "trans"},
         "keywords": [],
     }
-    assert dump(_import) == "i18n.trans"
+    assert dump(_import) == "i18next.trans"
 
 
 def test_get_calls_with_imports_for__from__x_import__y_as():
@@ -109,7 +109,7 @@ def test_get_calls_with_imports_for__from__x_import__y_as():
         "func": {"ctx": {}, "id": "_"},
         "keywords": [],
     }
-    assert dump(_import) == "i18n.trans"
+    assert dump(_import) == "i18next.trans"
 
 
 def test_get_calls_with_imports_for__import__x():
@@ -123,10 +123,10 @@ def test_get_calls_with_imports_for__import__x():
 
     assert dump(call) == {
         "args": [{"kind": None, "value": "3"}],
-        "func": {"attr": "trans", "ctx": {}, "value": {"ctx": {}, "id": "i18n"}},
+        "func": {"attr": "trans", "ctx": {}, "value": {"ctx": {}, "id": "i18next"}},
         "keywords": [],
     }
-    assert dump(_import) == "i18n.trans"
+    assert dump(_import) == "i18next.trans"
 
 
 def test_get_calls_with_imports_for__import__x__as():
@@ -143,12 +143,12 @@ def test_get_calls_with_imports_for__import__x__as():
         "func": {"attr": "trans", "ctx": {}, "value": {"ctx": {}, "id": "_"}},
         "keywords": [],
     }
-    assert dump(_import) == "i18n.trans"
+    assert dump(_import) == "i18next.trans"
 
 
 def test_get_calls_with_imports_from__class():
     tree = Tree.from_ast(ast.parse(inspect.getsource(func6)))
-    result = list(tree.extract_calls("i18n.trans"))
+    result = list(tree.extract_calls("i18next.trans"))
 
     assert len(result) == 4
 

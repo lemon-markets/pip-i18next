@@ -5,8 +5,8 @@ import os
 import sys
 from typing import Iterable, Iterator
 
-from i18n import config
-from i18n.parser import parse
+from i18next import config
+from i18next.parser import parse
 
 logger = logging.getLogger("i81n.cli")
 
@@ -56,10 +56,17 @@ def update_translation_keys(paths: Iterable[str]) -> None:
 def main(args=None):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("search_paths", nargs="*", default=["."])
-    parser.add_argument("--locale", nargs="?", type=str)
-    parser.add_argument("--lang", nargs="?")
-    parser.add_argument("--debug", "-d", action="store_true")
+    parser.add_argument(
+        "search_paths",
+        nargs="*",
+        default=["."],
+        help="Paths to search for python files",
+    )
+    parser.add_argument("--locale", nargs="?", type=str, help="Locale directory path")
+    parser.add_argument("--lang", nargs="?", help="Language code")
+    parser.add_argument(
+        "--debug", "-d", action="store_true", help="Enable debug logging"
+    )
 
     args = parser.parse_args(args=args)
 
