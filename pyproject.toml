@@ -28,7 +28,7 @@ classifiers = [
     "Topic :: Software Development :: Localization",
 ]
 dynamic = ["version", "description"]
-requires-python = ">=3.8,<3.11"
+requires-python = ">=3.8,<4"
 
 [project.optional-dependencies]
 test = [
