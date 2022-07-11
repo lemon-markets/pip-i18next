@@ -1,6 +1,6 @@
 """i18next - library facilitating internationalization and localization (i18n)
 of Python applications """
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 from .base import trans, config
 
