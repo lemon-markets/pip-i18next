@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class Config:
-    locale_path: str = "./locale"
+    locale_path: str = "./locales"
     fallback_lang: str = "en"
     strict: bool = False
 

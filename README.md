@@ -86,7 +86,7 @@ The table below describes the configuration parameters:
 | Parameter     | Description                                                                                                                                                                                          | Default value |
 |---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
 | fallback_lang | Fallback language to search for translation key if one cannot be found for requested language                                                                                                        | en            |
-| locale_path   | Locale directory path                                                                                                                                                                                | ./locale      |
+| locale_path   | Locale directory path                                                                                                                                                                                | ./locales     |
 | strict        | Flag determining the behavior of `trans` function. If set to False - `key` itself will be returned in case one has not been found or interpolation has failed , otherwise - exception will be raised | False         |
 
 ## Usage
