@@ -17,6 +17,7 @@ integration with tools and processes supported by external companies such as [lo
 We figured out we would write our own module that would improve the life of a Python developer in this area.
 
 **Please note that this project is in the early development phase.**
+This project is an open source project. We would really appreciate if you could help us to improve it. Fell free to report any issue or suggest a new feature.
 
 
 ## Installation
