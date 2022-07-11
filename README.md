@@ -1,10 +1,10 @@
 # i18next
 
-[![License](https://img.shields.io/github/license/lemon-markets/pip-i18n-turbo
+[![License](https://img.shields.io/github/license/lemon-markets/pip-i18next
 )](./LICENSE)
-[![Tests](https://img.shields.io/github/workflow/status/lemon-markets/pip-i18n-turbo/tests/main?label=tests)](https://github.com/lemon-markets/sdk-python/actions)
-[![Python versions](https://img.shields.io/pypi/pyversions/pip-i18n-turbo.svg)](https://pypi.python.org/pypi/i18next/)
-[![PyPI](https://img.shields.io/pypi/v/i18next)](https://pypi.python.org/pypi/i18-next/)
+[![Tests](https://img.shields.io/github/workflow/status/lemon-markets/pip-i18next/tests/main?label=tests)](https://github.com/lemon-markets/sdk-python/actions)
+[![Python versions](https://img.shields.io/pypi/pyversions/pip-i18next.svg)](https://pypi.python.org/pypi/i18next/)
+[![PyPI](https://img.shields.io/pypi/v/i18next)](https://pypi.python.org/pypi/i18next/)
 
 **i18next** is a library facilitating internationalization and localization (i18n) of your Python applications
 
